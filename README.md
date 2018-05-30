@@ -27,24 +27,31 @@ scikit-image
 pip install scikit-image
 ```
 
-### Run
-
-To run:
-
-```
-python python_image_mosaic.py
-```
-
 ### User Defined Variables
 
 In the code, there are variables that can be changed
 1) The name of the input image -> 'mainImageTarget'
 2) Number of tiles to devide image into -> 'numberOfTiles'
-3) Mode -> [1] Compare to rgb to rgb (small resized images)
-		   [2] Compare CIE-lab to CIE-lab (small resized images)
-		   [3] Compare to rgb to rgb (original size images)
-		   [4] Compare CIE-lab to CIE-lab (original size images)
-4) Use library for the RGB->CIE-lab conversion (True = yes, False = no)
+3) Comparison Mode -> [1] Compare rgb to rgb (small tiles)
+					  [2] Compare transformed rgb to transformed rgb (small tiles)
+					  [3] Compare rgb to rgb (big tiles)
+					  [4] Compare transformed rgb to transformed rgb (big tiles)
+4) Transform Mode ->  [1] no transformation
+					  [2] RGB -> sRGB
+					  [3] RGB -> CIE-Lab (my implimentation) 
+					  [4] RGB -> CIE-Lab (scikit-image)
+
+*As of the latest version, this is not required, refer to command line usage.
+*However, if you wish to use it the old way, look for this piece of code.
+
+```python
+#& user defined if need be. 
+mode = args['mode']
+transform = args['mode']
+numberOfTiles = args['tiles']
+mainImageTarget = args['file']
+#&
+```
 
 Change in this section of the code:
 ```python
@@ -54,6 +61,16 @@ numberOfTiles = 1600
 mode = 2    
 useSkImage = False
 ##&
+```
+
+## Command-Line Usage
+
+
+
+To run:
+
+```
+python python_image_mosaic.py 
 ```
 ## Contributing
 

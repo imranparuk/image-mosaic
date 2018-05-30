@@ -137,7 +137,7 @@ class image_mosiac():
         srgb = self.convert_rgb_to_srgb(inputColor)
         return  self.convert_srgb_to_lab(srgb)
     
-    def transformMatrixRGBtoLAB(self, numpyArr):
+    def transformMatrixConvert(self, numpyArr):
         """
         Transforms RGB numpy matrix to LAB numpy matrix
         
@@ -214,11 +214,11 @@ class image_mosiac():
             if (self.comparisonMode == 1):         
                 title_np_ave = numpy.mean(tile_np_mini, axis=(0, 1))
             elif (self.comparisonMode == 2):
-                title_np_ave = numpy.mean(self.transformMatrixRGBtoLAB(tile_np_mini.copy()), axis=(0, 1))
+                title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np_mini.copy()), axis=(0, 1))
             elif (self.comparisonMode == 3):
                 title_np_ave = numpy.mean(tile_np, axis=(0, 1))
             else:
-                title_np_ave = numpy.mean(self.transformMatrixRGBtoLAB(tile_np.copy()), axis=(0, 1))
+                title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np.copy()), axis=(0, 1))
             
             self.tileDict[file] = [tile_np_mini, title_np_ave]
     
@@ -244,7 +244,7 @@ class image_mosiac():
                 int_j = int(j)
                 
                 sub_matrix =self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1].copy()
-                sub_average = numpy.mean(self.transformMatrixRGBtoLAB(sub_matrix) , axis=(0, 1)) 
+                sub_average = numpy.mean(self.transformMatrixConvert(sub_matrix) , axis=(0, 1)) 
        
                 maximum = self.MaxFunction(self.tileDict, sub_average)  
                 maxKey = list(maximum.keys())[0]
@@ -258,36 +258,66 @@ class image_mosiac():
         """
         return Image.fromarray(self.np_scaled_input_image, 'RGB')   
        
+class isModeAction(argparse.Action):
 
+    def __call__(self, parser, namespace, values, option_string=None):
+         if values not in range(1, 5):
+            parser.error("{0} is not a valid mode. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
+            #raise argparse.ArgumentError("Minimum bandwidth is 12")
 
-#def str2bool(v):
-#    if v.lower() in ('yes', 'true', 't', 'y', '1'):
-#        return True
-#    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
-#        return False
-#    else:
-#        raise argparse.ArgumentTypeError('Boolean value expected.')
-  
+         setattr(namespace, self.dest, values)
+         
+class isTransformAction(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+         if values not in range(1, 5):
+            parser.error("{0} is not a valid transform. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
+            #raise argparse.ArgumentError("Minimum bandwidth is 12")
+
+         setattr(namespace, self.dest, values)
+         
+class isSqrtAction(argparse.Action):
+    
+    def is_square(self, n):
+        '''
+        To account for large number overflows in standard library, this code was stolen from:
+            https://stackoverflow.com/a/44531128
+        '''
+        if n<1:
+            return False
+        else:
+            for i in range(int(n/2)+1):
+                if (i*i)==n:
+                    return True
+            return False
+    
+    def __call__(self, parser, namespace, values, option_string=None):
+         if not self.is_square(values):
+            parser.error("{0} is not a valid squared number. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
+            #raise argparse.ArgumentError("Minimum bandwidth is 12")
+
+         setattr(namespace, self.dest, values)
 
 if __name__ == "__main__":
     
     parser = ArgumentParser()
-    parser.add_argument('-m','--mode', type=int)
-    parser.add_argument('-trans', '-tr', '--transform', type=int)
-    parser.add_argument('-t', '--tiles', type=int)
+    parser.add_argument('-m','--mode',action=isModeAction, type=int)
+    parser.add_argument('-trans', '-tr', '--transform', action=isTransformAction,type=int)
+    parser.add_argument('-t', '--tiles',action=isSqrtAction, type=int)
+    parser.add_argument('-f', '--file', type = str)
 #    parser.add_argument('-l', '--lib', type=str2bool, nargs='?',
 #                        const=False, default=0,
 #                        help="Use default library for CIE-*Lab transformation")
-    parser.add_argument('-f', '--file', type = str)
     args = vars(parser.parse_args())
+#   useSkImage = args['lib']
     
     
+    #& user defined if need be. 
     mode = args['mode']
     transform = args['mode']
     numberOfTiles = args['tiles']
     mainImageTarget = args['file']
-
-#    useSkImage = args['lib']
+    #&
         
     try:
         wk_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
