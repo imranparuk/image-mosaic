@@ -4,10 +4,6 @@
 
 > A Image Mosaic generator made with Python 
 
-# Project Title
-
-One Paragraph of project description goes here
-
 ## Getting Started
 
 To get up and running, make sure you have [Python](https://www.python.org/) installed
@@ -25,7 +21,6 @@ pip install numpy
 Pillow:
 ```
 pip install pillow
-pip install scikit-image
 ```
 scikit-image
 ```
