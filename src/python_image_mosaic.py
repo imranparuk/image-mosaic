@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Wed May 30 23:05:09 2018
+
+@author: 2307221
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Wed May 30 12:03:36 2018
 
 @author: imranparuk
@@ -16,6 +23,9 @@ from os.path import isfile, join
 import sys
 from sys import argv
 
+import argparse
+from argparse import ArgumentParser
+
 
 #used to show that program is still running
 import spinner
@@ -25,12 +35,12 @@ class image_mosiac():
     This class creates image mosaics in python using numpy and PIL (Pillow) 
     -An input image is used to create a new image from 'tiles' (other images)    
     """
-    def __init__(self, inputImageFile, tilesFiles, numTiles, comparisonMode, useSkImage=False):
+    def __init__(self, inputImageFile, tilesFiles, numTiles, comparisonMode=1, transform=1):
         """
         Python class constructor
             - initilizes all class objects
         """
-        self.useSkImage = useSkImage
+        self.transform = transform
         self.comparisonMode = comparisonMode
         self.tile_max_px = numpy.sqrt(numTiles)
         
@@ -130,19 +140,29 @@ class image_mosiac():
     def transformMatrixRGBtoLAB(self, numpyArr):
         """
         Transforms RGB numpy matrix to LAB numpy matrix
+        
+        transform done based on user requirements, this is set in 'self.transform'
+        [1] general RGB 
+        [2] RGB -> sRGB
+        [3] RGB -> LAB (using my own implimentation)
+        [4] RGB -> LAB (using built in library)
         """
         size = numpyArr.shape
         x = size[0]
         y = size[1]
-
         for i in range(0, x-1):
             for j in range(0, y-1):
-                tempArr = numpyArr[i, j]
-                tempArrTransform = self.convert_rgb_to_srgb(tempArr) if (self.useSkImage == False) else self.scipy_rgb_to_lab(tempArr)
+                tempArr = numpyArr[i, j]        
+                if (self.transform == 1):
+                    tempArrTransform = tempArr
+                elif (self.transform == 2):
+                    tempArrTransform = self.convert_rgb_to_srgb(tempArr)
+                elif (self.transform == 3):
+                    tempArrTransform = self.my_rgb_to_lab(tempArr)
+                else:
+                    tempArrTransform = self.scipy_rgb_to_lab(tempArr)
                 numpyArr[i, j] = tempArrTransform
-    
-        return numpyArr          
-        
+        return numpyArr            
     
     def getEuclideanDistance(self, x, y):
         """
@@ -224,7 +244,7 @@ class image_mosiac():
                 int_j = int(j)
                 
                 sub_matrix =self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1].copy()
-                sub_average = numpy.mean(sub_matrix, axis=(0, 1)) if ((self.comparisonMode%2) == 1) else numpy.mean(self.transformMatrixRGBtoLAB(sub_matrix) , axis=(0, 1)) 
+                sub_average = numpy.mean(self.transformMatrixRGBtoLAB(sub_matrix) , axis=(0, 1)) 
        
                 maximum = self.MaxFunction(self.tileDict, sub_average)  
                 maxKey = list(maximum.keys())[0]
@@ -236,12 +256,39 @@ class image_mosiac():
         This function is used to return a resulting image after all the image processing is done.
         It returns a standard RGB image that can be saved.
         """
-        return Image.fromarray(self.np_scaled_input_image, 'RGB')        
+        return Image.fromarray(self.np_scaled_input_image, 'RGB')   
+       
+
+
+#def str2bool(v):
+#    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+#        return True
+#    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+#        return False
+#    else:
+#        raise argparse.ArgumentTypeError('Boolean value expected.')
+  
 
 if __name__ == "__main__":
     
+    parser = ArgumentParser()
+    parser.add_argument('-m','--mode', type=int)
+    parser.add_argument('-trans', '-tr', '--transform', type=int)
+    parser.add_argument('-t', '--tiles', type=int)
+#    parser.add_argument('-l', '--lib', type=str2bool, nargs='?',
+#                        const=False, default=0,
+#                        help="Use default library for CIE-*Lab transformation")
+    parser.add_argument('-f', '--file', type = str)
+    args = vars(parser.parse_args())
+    
+    
+    mode = args['mode']
+    transform = args['mode']
+    numberOfTiles = args['tiles']
+    mainImageTarget = args['file']
 
-    file, tiles, my_mode, sk_image = argv
+#    useSkImage = args['lib']
+        
     try:
         wk_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     except NameError:
@@ -253,13 +300,7 @@ if __name__ == "__main__":
     tileImagesSubdir = "\\DB\\"
     path = os.path.normpath(wk_dir)
     
-    ##& -> User Defined Variables
-    mainImageTarget = file#"1_in.jpg"
-    numberOfTiles = tiles#1600
-    mode = my_mode #2    
-    useSkImage = sk_image#False
-    ##&
-    
+
     output_image = "out_" + mainImageTarget
 
     print("Target Image:= {0}".format(path+mainImageSubdir+mainImageTarget))
@@ -273,7 +314,7 @@ if __name__ == "__main__":
     files = [path + tileImagesSubdir + f for f in listdir(path + tileImagesSubdir) if isfile(join(path + tileImagesSubdir, f))]
     mainImagePath = path+mainImageSubdir+mainImageTarget
 
-    image_mos = image_mosiac(mainImagePath, files, numberOfTiles, mode, useSkImage)
+    image_mos = image_mosiac(mainImagePath, files, numberOfTiles, mode, transform)
 
     image = image_mos.returnImage()
     with open(path+mainImageSubdir+output_image, 'w') as f:
