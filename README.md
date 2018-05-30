@@ -72,6 +72,7 @@ $	sudo python python_image_mosaic.py -m 1 -t 400 - tr 3 -f 1_in.jpg
 ```
 
 ##Example Output
+
 Target Image               |  Resulting Image
 :-------------------------:|:-------------------------:
 ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/1_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_1_in.jpg)
