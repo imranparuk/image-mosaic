@@ -12,11 +12,13 @@ from skimage import io, color
 import os
 from os import listdir
 from os.path import isfile, join
+
 import sys
+from sys import argv
+
 
 #used to show that program is still running
 import spinner
-
 
 class image_mosiac():
     """
@@ -33,7 +35,8 @@ class image_mosiac():
         self.tile_max_px = numpy.sqrt(numTiles)
         
         self.tilesFiles = tilesFiles
-        
+        self.N = float(4.0 / 29.0)
+
         self.input_image = Image.open(inputImageFile)
         self.np_input_image = numpy.array(self.input_image)
 
@@ -43,15 +46,16 @@ class image_mosiac():
         self.tile_max_x_px = int(self.np_scaled_input_image.shape[0]/self.tile_max_px)
         self.tile_max_y_px = int(self.np_scaled_input_image.shape[1]/self.tile_max_px)
         
-        self.conversion_matrix  = [[0.412453, 0.357580, 0.180423],
-                                   [0.212671, 0.715160, 0.072169],
-                                   [0.019334, 0.119193, 0.950227]]
+        self.conversion_matrix = numpy.array( [[0.4124564,  0.3575761,  0.1804375],
+                                       [0.2126729,  0.7151522,  0.0721750],
+                                       [0.0193339,  0.1191920,  0.9503041]])
+    
+        self.illumination_matrix = numpy.array([95.047, 100.0, 108.883])
         
         self.tileDict = {}
         self.populateTileDict()
         self.iterateThroughArray()
-        
-        
+  
     def scaleInputImage(self, image, np_image):
         """
         This function scales in input image to ensure you can fit all the tiles in
@@ -67,38 +71,7 @@ class image_mosiac():
         
         size = (adjustScalex, adjustScaley)
         return image.resize(size, Image.ANTIALIAS)
-        
-    def func(self, t):
-        """
-        used by 'rgb_to_lab' function
-        """
-        if (t > 0.008856):
-            return numpy.power(t, 1/3.0)
-        else:
-            return 7.787 * t + 16 / 116.0
-    
-    def simple_rgb_to_lab(self, rgb):
-        """
-        Stolen Code:
-            https://gist.github.com/bikz05/6fd21c812ef6ebac66e1
-        
-        used to convert RGB from the color-space to the CIE*Lab color-space
-        """
-        np_rgb = numpy.array(rgb)
-        
-        normalized_rgb = np_rgb / 255
-    
-        cie = numpy.dot(self.conversion_matrix, normalized_rgb)
-        
-        cie[0] = cie[0] /0.950456
-        cie[2] = cie[2] /1.088754 
-    
-        L = 116 * numpy.power(cie[1], 1/3.0) - 16.0 if cie[1] > 0.008856 else 903.3 * cie[1]
-        a = 500*(self.func(cie[0]) - self.func(cie[1]))
-        b = 200*(self.func(cie[1]) - self.func(cie[2]));
-        
-        return [L, a, b]
-    
+            
     def scipy_rgb_to_lab(self, rgb):
         """
         This function is used to convert RGB from the color-space to the CIE*Lab color-space
@@ -108,51 +81,51 @@ class image_mosiac():
         np_rgb = numpy.array([[rgb]])
         lab = color.rgb2lab(np_rgb/255)
         return lab
+
+
+    def convert_rgb_to_srgb(self, rgbVal):
+        '''
+        This function converts from the RGB color-space to the sRGB color space
+        Transformation formulae from: 
+            https://www.image-engineering.de/library/technotes/958-how-to-convert-between-srgb-and-ciexyz
+                
+            V' = {   V/12.92                   if (v < 0.04545)
+                 {   ((V+0.055)/1.055)^2.4     else
+        '''
+        in_col_np = numpy.array(rgbVal)
+        in_col_np_norm = in_col_np/255
+        return numpy.array([ numpy.power(((value + 0.055) / 1.055), 2.4) if value > 0.04045 else value / 12.92 for value in in_col_np_norm])
     
-    def robust_rgb2lab(self, inputColor):
-        """
-        Stolen Code:
-            https://gist.github.com/manojpandey/f5ece715132c572c80421febebaf66ae
+       
+    def convert_srgb_to_lab(self, srgbVal):
+        '''
+        This function converts sRGB to the CIE-XYZ, then to the CIE-*Lab color spaces respectively. 
+        following the algorithm described in these links:
+            http://www.easyrgb.com/en/math.php
+            https://stackoverflow.com/a/5021831
+            https://en.wikipedia.org/wiki/CIELAB_color_space#Forward_transformation
+            
+        Assumed: Under Illuminant D65 with normalization Y = 100
+        '''
+        srgbVal_norm = srgbVal.dot(100)
+
+        dot_prod = self.conversion_matrix.dot(srgbVal_norm)
+        dot_prod_illumin = numpy.array([dot_prod[0]/self.illumination_matrix[0], dot_prod[1]/self.illumination_matrix[1], dot_prod[2]/self.illumination_matrix[2] ])
         
-        used to convert RGB from the color-space to the CIE*Lab color-space
-        """
-        num = 0
-        RGB = [0, 0, 0]
-        for value in inputColor:
-            value = float(value) / 255
-            if value > 0.04045:
-                value = ((value + 0.055) / 1.055) ** 2.4
-            else:
-                value = value / 12.92   
-            RGB[num] = value * 100
-            num = num + 1
-        XYZ = [0, 0, 0, ]
-        X = RGB[0] * 0.4124 + RGB[1] * 0.3576 + RGB[2] * 0.1805
-        Y = RGB[0] * 0.2126 + RGB[1] * 0.7152 + RGB[2] * 0.0722
-        Z = RGB[0] * 0.0193 + RGB[1] * 0.1192 + RGB[2] * 0.9505
-        XYZ[0] = round(X, 4)
-        XYZ[1] = round(Y, 4)
-        XYZ[2] = round(Z, 4)
-        # Observer= 2°, Illuminant= D65
-        XYZ[0] = float(XYZ[0]) / 95.047         # ref_X =  95.047
-        XYZ[1] = float(XYZ[1]) / 100.0          # ref_Y = 100.000
-        XYZ[2] = float(XYZ[2]) / 108.883        # ref_Z = 108.883  
-        num = 0
-        for value in XYZ:  
-            if value > 0.008856:
-                value = value ** (0.3333333333333333)
-            else:
-                value = (7.787 * value) + (16 / 116)   
-            XYZ[num] = value
-            num = num + 1   
-        Lab = [0, 0, 0]  
+        XYZ = [ (numpy.power(value, 1/3) if (value > 0.008856) else (7.787 * value) + (16 / 116) ) for value in dot_prod_illumin]
+    
         L = (116 * XYZ[1]) - 16
         a = 500 * (XYZ[0] - XYZ[1])
         b = 200 * (XYZ[1] - XYZ[2])   
-        Lab[0] = round(L, 4)
-        Lab[1] = round(a, 4)
-        Lab[2] = round(b, 4)  
-        return numpy.array(Lab)
+    
+        return numpy.array([L,a,b])
+    
+    def my_rgb_to_lab(self, inputColor):
+        '''
+        this function converts from colors from the RGB color-space to the CIE-Lab color space
+        '''
+        srgb = self.convert_rgb_to_srgb(inputColor)
+        return  self.convert_srgb_to_lab(srgb)
     
     def transformMatrixRGBtoLAB(self, numpyArr):
         """
@@ -165,7 +138,7 @@ class image_mosiac():
         for i in range(0, x-1):
             for j in range(0, y-1):
                 tempArr = numpyArr[i, j]
-                tempArrTransform = self.robust_rgb2lab(tempArr) if (self.useSkImage == False) else self.scipy_rgb_to_lab(tempArr)
+                tempArrTransform = self.convert_rgb_to_srgb(tempArr) if (self.useSkImage == False) else self.scipy_rgb_to_lab(tempArr)
                 numpyArr[i, j] = tempArrTransform
     
         return numpyArr          
@@ -266,6 +239,9 @@ class image_mosiac():
         return Image.fromarray(self.np_scaled_input_image, 'RGB')        
 
 if __name__ == "__main__":
+    
+
+    file, tiles, my_mode, sk_image = argv
     try:
         wk_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     except NameError:
@@ -278,10 +254,10 @@ if __name__ == "__main__":
     path = os.path.normpath(wk_dir)
     
     ##& -> User Defined Variables
-    mainImageTarget = "1_in.jpg"
-    numberOfTiles = 1600
-    mode = 2    
-    useSkImage = False
+    mainImageTarget = file#"1_in.jpg"
+    numberOfTiles = tiles#1600
+    mode = my_mode #2    
+    useSkImage = sk_image#False
     ##&
     
     output_image = "out_" + mainImageTarget
@@ -289,7 +265,6 @@ if __name__ == "__main__":
     print("Target Image:= {0}".format(path+mainImageSubdir+mainImageTarget))
     print("Tile Images Directory:= {0}".format(path + tileImagesSubdir))
     print("Number of Tiles:= {0}".format(numberOfTiles))
-    
     
     sys.stdout.write("Program Running: ")
     spinner = spinner.Spinner()
