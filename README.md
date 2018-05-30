@@ -47,7 +47,7 @@ In the code, there are variables that can be changed
 4) Use library for the RGB->CIE*lab conversion (True = yes, False = no)
 
 Change in this section of the code:
-```
+```python
 ##& -> User Defined Variables
 mainImageTarget = "1_in.jpg"
 numberOfTiles = 1600
