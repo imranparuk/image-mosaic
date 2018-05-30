@@ -71,7 +71,7 @@ Example usage
 $	sudo python python_image_mosaic.py -m 1 -t 400 - tr 3 -f 1_in.jpg
 ```
 
-##Example Output
+## Example Output
 
 Target Image               |  Resulting Image
 :-------------------------:|:-------------------------:
