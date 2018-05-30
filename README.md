@@ -48,21 +48,11 @@ In the code, there are variables that can be changed
 
 ```python
 #& user defined if need be. 
-mode = args['mode']
-transform = args['mode']
-numberOfTiles = args['tiles']
-mainImageTarget = args['file']
+mode = args['mode']            #2
+transform = args['mode']	   #3
+numberOfTiles = args['tiles']  # 200
+mainImageTarget = args['file'] #"1_in.jpg"
 #&
-```
-
-Change in this section of the code:
-```python
-##& -> User Defined Variables
-mainImageTarget = "1_in.jpg"
-numberOfTiles = 1600
-mode = 2    
-useSkImage = False
-##&
 ```
 
 ## Command-Line Usage
