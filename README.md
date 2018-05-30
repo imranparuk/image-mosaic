@@ -4,10 +4,6 @@
 
 > A Image Mosaic generator made with Python 
 
-Target Image               |  Resulting Image
-:-------------------------:|:-------------------------:
-![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/1_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_1_in.jpg)
-
 ## Getting Started
 
 To get up and running, make sure you have [Python](https://www.python.org/) installed
@@ -74,6 +70,12 @@ Example usage
 ```
 $	sudo python python_image_mosaic.py -m 1 -t 400 - tr 3 -f 1_in.jpg
 ```
+
+##Example Output
+Target Image               |  Resulting Image
+:-------------------------:|:-------------------------:
+![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/1_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_1_in.jpg)
+
 
 ## Contributing
 
