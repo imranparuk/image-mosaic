@@ -89,11 +89,11 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 
 Thank you to:
-+http://www.easyrgb.com/en/math.php
-+https://stackoverflow.com/a/5021831
-+https://en.wikipedia.org/wiki/CIELAB_color_space#Forward_transformation
-+https://gist.github.com/bikz05/6fd21c812ef6ebac66e1
-+https://gist.github.com/manojpandey/f5ece715132c572c80421febebaf66ae
-+https://stackoverflow.com/a/39504463
++ http://www.easyrgb.com/en/math.php
++ https://stackoverflow.com/a/5021831
++ https://en.wikipedia.org/wiki/CIELAB_color_space#Forward_transformation
++ https://gist.github.com/bikz05/6fd21c812ef6ebac66e1
++ https://gist.github.com/manojpandey/f5ece715132c572c80421febebaf66ae
++ https://stackoverflow.com/a/39504463
 
 
