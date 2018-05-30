@@ -35,6 +35,26 @@ To run:
 python python_image_mosaic.py
 ```
 
+### User Defined Variables
+
+In the code, there are variables that can be changed
+1) The name of the input image -> 'mainImageTarget'
+2) Number of tiles to devide image into -> 'numberOfTiles'
+3) Mode -> [1] Compare to rgb to rgb (small resized images)
+		   [2] Compare CIE*lab to CIE*lab (small resized images)
+		   [3] Compare to rgb to rgb (original size images)
+		   [4] Compare CIE*lab to CIE*lab (original size images)
+4) Use library for the RGB->CIE*lab conversion (True = yes, False = no)
+
+Change in this section of the code:
+```
+##& -> User Defined Variables
+mainImageTarget = "1_in.jpg"
+numberOfTiles = 1600
+mode = 2    
+useSkImage = False
+##&
+```
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
