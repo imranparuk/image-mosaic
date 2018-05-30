@@ -30,19 +30,19 @@ pip install scikit-image
 ### User Defined Variables
 
 In the code, there are variables that can be changed
-1) The name of the input image -> 'mainImageTarget'
-2) Number of tiles to devide image into -> 'numberOfTiles'
-3) Comparison Mode -> [1] Compare rgb to rgb (small tiles)
-					  [2] Compare transformed rgb to transformed rgb (small tiles)
-					  [3] Compare rgb to rgb (big tiles)
-					  [4] Compare transformed rgb to transformed rgb (big tiles)
-4) Transform Mode ->  [1] no transformation
-					  [2] RGB -> sRGB
-					  [3] RGB -> CIE-Lab (my implimentation) 
-					  [4] RGB -> CIE-Lab (scikit-image)
+1. The name of the input image -> 'mainImageTarget'
+2. Number of tiles to devide image into -> 'numberOfTiles'
+3. Comparison Mode -> - [1] Compare rgb to rgb (small tiles)
+					  - [2] Compare transformed rgb to transformed rgb (small tiles)
+					  - [3] Compare rgb to rgb (big tiles)
+					  - [4] Compare transformed rgb to transformed rgb (big tiles)
+4. Transform Mode ->  - [1] no transformation
+					  - [2] RGB -> sRGB
+					  - [3] RGB -> CIE-Lab (my implimentation) 
+					  - [4] RGB -> CIE-Lab (scikit-image)
 
-*As of the latest version, this is not required, refer to command line usage.
-*However, if you wish to use it the old way, look for this piece of code.
+*As of the latest version, this is not required, refer to command line usage.*
+*However, if you wish to use it the old way, look for this piece of code.*
 
 ```python
 #& user defined if need be. 
@@ -69,10 +69,10 @@ To use the script you need to attached arguments in the command-line,
 
 Refer to above (User Defined Variables) for explination on values, 
 
-[-m] mode := comparison mode, is int of range [1 -> 4]
-[-t] tiles := number of tiles, is and int and must be a square number
-[-tr] or [-trans] transform mode := transformation from RGB to ... , is int of range [1 -> 4]
-[-f] file := target file, is the filename of the image.
+-[-m] mode := comparison mode, is int of range [1 -> 4]
+-[-t] tiles := number of tiles, is and int and must be a square number
+-[-tr] or [-trans] transform mode := transformation from RGB to ... , is int of range [1 -> 4]
+-[-f] file := target file, is the filename of the image.
 
 Example usage
 ```
