@@ -297,12 +297,7 @@ if __name__ == "__main__":
     parser.add_argument('-m','--mode',action=isModeAction, type=int)
     parser.add_argument('-trans', '-tr', '--transform', action=isTransformAction,type=int)
     parser.add_argument('-t', '--tiles',action=isSqrtAction, type=int)
-    parser.add_argument('-f', '--file', type = str)
-#   parser.add_argument('-l', '--lib', type=str2bool, nargs='?',
-#                        const=False, default=0,
-#                        help="Use default library for CIE-*Lab transformation")
-#   useSkImage = args['lib']
-    
+    parser.add_argument('-f', '--file', type = str)   
     args = vars(parser.parse_args())
 
     #& user defined if need be. 
@@ -322,8 +317,6 @@ if __name__ == "__main__":
     mainImageSubdir = "\\Example Output\\"
     tileImagesSubdir = "\\DB\\"
     path = os.path.normpath(wk_dir)
-    
-
     output_image = "out_" + mainImageTarget
 
     print("Target Image:= {0}".format(path+mainImageSubdir+mainImageTarget))
@@ -349,7 +342,7 @@ if __name__ == "__main__":
     print("Output file:= {0}".format(path+mainImageSubdir+output_image))
 
     image.show()
-
+    #eof
 
 
 
