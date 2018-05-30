@@ -39,9 +39,6 @@ python python_image_mosaic.py
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
 
@@ -57,5 +54,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 Thank you to:
 
-*https://gist.github.com/bikz05/6fd21c812ef6ebac66e1
-*https://gist.github.com/manojpandey/f5ece715132c572c80421febebaf66ae
+https://gist.github.com/bikz05/6fd21c812ef6ebac66e1
+https://gist.github.com/manojpandey/f5ece715132c572c80421febebaf66ae
