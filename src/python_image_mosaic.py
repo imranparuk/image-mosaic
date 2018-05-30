@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 30 23:05:09 2018
-
-@author: 2307221
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed May 30 12:03:36 2018
 
 @author: imranparuk
@@ -257,9 +250,11 @@ class image_mosiac():
         It returns a standard RGB image that can be saved.
         """
         return Image.fromarray(self.np_scaled_input_image, 'RGB')   
+    
+    
+####################################################################################################################################################
        
 class isModeAction(argparse.Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
          if values not in range(1, 5):
             parser.error("{0} is not a valid mode. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
@@ -268,7 +263,6 @@ class isModeAction(argparse.Action):
          setattr(namespace, self.dest, values)
          
 class isTransformAction(argparse.Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
          if values not in range(1, 5):
             parser.error("{0} is not a valid transform. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
@@ -277,7 +271,6 @@ class isTransformAction(argparse.Action):
          setattr(namespace, self.dest, values)
          
 class isSqrtAction(argparse.Action):
-    
     def is_square(self, n):
         '''
         To account for large number overflows in standard library, this code was stolen from:
@@ -294,7 +287,7 @@ class isSqrtAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
          if not self.is_square(values):
             parser.error("{0} is not a valid squared number. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
-            #raise argparse.ArgumentError("Minimum bandwidth is 12")
+            #raise argparse.ArgumentError("blah")
 
          setattr(namespace, self.dest, values)
 
@@ -305,13 +298,13 @@ if __name__ == "__main__":
     parser.add_argument('-trans', '-tr', '--transform', action=isTransformAction,type=int)
     parser.add_argument('-t', '--tiles',action=isSqrtAction, type=int)
     parser.add_argument('-f', '--file', type = str)
-#    parser.add_argument('-l', '--lib', type=str2bool, nargs='?',
+#   parser.add_argument('-l', '--lib', type=str2bool, nargs='?',
 #                        const=False, default=0,
 #                        help="Use default library for CIE-*Lab transformation")
-    args = vars(parser.parse_args())
 #   useSkImage = args['lib']
     
-    
+    args = vars(parser.parse_args())
+
     #& user defined if need be. 
     mode = args['mode']
     transform = args['mode']
