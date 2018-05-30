@@ -65,13 +65,20 @@ useSkImage = False
 
 ## Command-Line Usage
 
+To use the script you need to attached arguments in the command-line,
 
+Refer to above (User Defined Variables) for explination on values, 
 
-To run:
+[-m] mode := comparison mode, is int of range [1 -> 4]
+[-t] tiles := number of tiles, is and int and must be a square number
+[-tr] or [-trans] transform mode := transformation from RGB to ... , is int of range [1 -> 4]
+[-f] file := target file, is the filename of the image.
 
+Example usage
 ```
-python python_image_mosaic.py 
+$	sudo python python_image_mosaic.py -m 1 -t 400 - tr 3 -f 1_in.jpg
 ```
+
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
