@@ -46,8 +46,8 @@ class image_mosiac():
         self.scaled_input_image = self.scaleInputImage(self.input_image, self.np_input_image)
         self.np_scaled_input_image = numpy.array(self.scaled_input_image)
         
-        self.tile_max_x_px = int(self.np_scaled_input_image.shape[0]/self.tile_max_px)
-        self.tile_max_y_px = int(self.np_scaled_input_image.shape[1]/self.tile_max_px)
+        self.tile_max_x_px = int(self.np_scaled_input_image.shape[1]/self.tile_max_px)
+        self.tile_max_y_px = int(self.np_scaled_input_image.shape[0]/self.tile_max_px)
         
         self.conversion_matrix = numpy.array( [[0.4124564,  0.3575761,  0.1804375],
                                        [0.2126729,  0.7151522,  0.0721750],
@@ -66,9 +66,9 @@ class image_mosiac():
         rounds that number off to a whole number and creates an optiumum size 
         which is then used to resize the original image (maintaining original aspect ratio)
         """
-        xdiv = (np_image.shape[0]/self.tile_max_px)
-        ydiv = (np_image.shape[1]/self.tile_max_px)
-        
+        xdiv = int(np_image.shape[1]/self.tile_max_px)
+        ydiv = int(np_image.shape[0]/self.tile_max_px)
+
         adjustScalex = int(self.tile_max_px * xdiv)
         adjustScaley = int(self.tile_max_px * ydiv)
         
@@ -200,6 +200,7 @@ class image_mosiac():
             
             size = (self.tile_max_x_px, self.tile_max_y_px)
             tile_pic_mini = tile_pic.resize(size)
+            
             tile_np_mini = numpy.array(tile_pic_mini)
             
             if (self.comparisonMode == 1):    
@@ -226,19 +227,21 @@ class image_mosiac():
         xdiv = self.tile_max_x_px
         ydiv = self.tile_max_y_px
         
-        for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[0],xdiv):
-            for j in numpy.arange(ydiv-1,self.np_scaled_input_image.shape[1],ydiv):
+        for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[1],xdiv):
+            for j in numpy.arange(ydiv-1,self.np_scaled_input_image.shape[0],ydiv):
                 int_i = int(i)
                 int_j = int(j)
                 
-                sub_matrix =self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1].copy()
+                sub_matrix =self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1].copy()
                 sub_average = numpy.mean(self.transformMatrixConvert(sub_matrix) , axis=(0, 1)) 
        
                 maximum = self.MaxFunction(self.tileDict, sub_average)  
                 maxKey = list(maximum.keys())[0]
-        
-                self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1] = self.tileDict[(maxKey)][0]
                 
+                #print("shape1: {0} , shape2: {1}".format(self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1].shape, self.tileDict[(maxKey)][0].shape) )
+        
+                #self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1] = self.tileDict[(maxKey)][0]
+                self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1] = self.tileDict[(maxKey)][0]
     def returnImage(self):
         """
         This function is used to return a resulting image after all the image processing is done.
