@@ -46,7 +46,7 @@ In the code, there are variables that can be changed
 
 ```python
 #& user defined if need be. 
-mode = args['mode']            #2
+mode = args['mode']            #1
 transform = args['mode']	   #3
 numberOfTiles = args['tiles']  # 200
 mainImageTarget = args['file'] #"1_in.jpg"
