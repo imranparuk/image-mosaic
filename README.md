@@ -33,10 +33,8 @@ In the code, there are variables that can be changed
 1. The name of the input image -> 'mainImageTarget'
 2. Number of tiles to devide image into -> 'numberOfTiles'
 3. Comparison Mode -> 
-+ [1] Compare rgb to rgb (small tiles)					  
-+ [2] Compare transformed rgb to transformed rgb (small tiles)
-+ [3] Compare rgb to rgb (big tiles)
-+ [4] Compare transformed rgb to transformed rgb (big tiles)
++ [1] Compare transformed rgb to transformed rgb (small tiles)
++ [2] Compare transformed rgb to transformed rgb (big tiles)
 4. Transform Mode ->  
 + [1] no transformation
 + [2] RGB -> sRGB
