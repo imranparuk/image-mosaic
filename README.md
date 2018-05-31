@@ -36,13 +36,13 @@ In the code, there are variables that can be changed
 + For non squared images, you input the number of square on x axis, and number of squares on y axis
 
 3. Comparison Mode -> 
-+ [1] Compare transformed rgb to transformed rgb (small tiles)
-+ [2] Compare transformed rgb to transformed rgb (big tiles)
+		+ [1] Compare transformed rgb to transformed rgb (small tiles)
+		+ [2] Compare transformed rgb to transformed rgb (big tiles)
 4. Transform Mode ->  
-+ [1] no transformation
-+ [2] RGB -> sRGB
-+ [3] RGB -> CIE-Lab (my implimentation) 
-+ [4] RGB -> CIE-Lab (scikit-image)
+		+ [1] no transformation
+		+ [2] RGB -> sRGB
+		+ [3] RGB -> CIE-Lab (my implimentation) 
+		+ [4] RGB -> CIE-Lab (scikit-image)
 
 *As of the latest version, this is not required, refer to command line usage.*
 *However, if you wish to use it the old way, look for this piece of code.*
