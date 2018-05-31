@@ -35,8 +35,15 @@ class image_mosiac():
         """
         self.transform = transform
         self.comparisonMode = comparisonMode
-        self.tile_max_px = numpy.sqrt(numTiles)
         
+        if not(len(numTiles) > 1):
+            tile_max_px = numpy.sqrt(numTiles)
+            self.num_tiles_x = tile_max_px
+            self.num_tiles_y = tile_max_px
+        else:
+            self.num_tiles_x = numTiles[0]
+            self.num_tiles_y = numTiles[1]
+       
         self.tilesFiles = tilesFiles
         self.N = float(4.0 / 29.0)
 
@@ -46,8 +53,10 @@ class image_mosiac():
         self.scaled_input_image = self.scaleInputImage(self.input_image, self.np_input_image)
         self.np_scaled_input_image = numpy.array(self.scaled_input_image)
         
-        self.tile_max_x_px = int(self.np_scaled_input_image.shape[1]/self.tile_max_px)
-        self.tile_max_y_px = int(self.np_scaled_input_image.shape[0]/self.tile_max_px)
+        print(self.np_scaled_input_image.shape)
+        
+        self.tile_max_x_px = int(self.np_scaled_input_image.shape[1]/self.num_tiles_x)
+        self.tile_max_y_px = int(self.np_scaled_input_image.shape[0]/self.num_tiles_y)
         
         self.conversion_matrix = numpy.array( [[0.4124564,  0.3575761,  0.1804375],
                                        [0.2126729,  0.7151522,  0.0721750],
@@ -66,11 +75,11 @@ class image_mosiac():
         rounds that number off to a whole number and creates an optiumum size 
         which is then used to resize the original image (maintaining original aspect ratio)
         """
-        xdiv = (np_image.shape[1]/self.tile_max_px)
-        ydiv = (np_image.shape[0]/self.tile_max_px)
+        xdiv = (np_image.shape[1]/self.num_tiles_x)
+        ydiv = (np_image.shape[0]/self.num_tiles_y)
 
-        adjustScalex = int(self.tile_max_px * xdiv)
-        adjustScaley = int(self.tile_max_px * ydiv)
+        adjustScalex = int(self.num_tiles_x * xdiv)
+        adjustScaley = int(self.num_tiles_y * ydiv)
         
         size = (adjustScalex, adjustScaley)
         return image.resize(size, Image.ANTIALIAS)
@@ -227,7 +236,10 @@ class image_mosiac():
         xdiv = self.tile_max_x_px
         ydiv = self.tile_max_y_px
         
-        for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[1],xdiv):
+        print(self.np_scaled_input_image.shape[1])
+        print(numpy.arange(19,750,20))
+        
+        for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[1]+1,xdiv):
             for j in numpy.arange(ydiv-1,self.np_scaled_input_image.shape[0],ydiv):
                 int_i = int(i)
                 int_j = int(j)
@@ -237,9 +249,7 @@ class image_mosiac():
        
                 maximum = self.MaxFunction(self.tileDict, sub_average)  
                 maxKey = list(maximum.keys())[0]
-                
-                #print("shape1: {0} , shape2: {1}".format(self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1].shape, self.tileDict[(maxKey)][0].shape) )
-        
+                        
                 #self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1] = self.tileDict[(maxKey)][0]
                 self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1] = self.tileDict[(maxKey)][0]
     def returnImage(self):
@@ -268,33 +278,12 @@ class isTransformAction(argparse.Action):
 
          setattr(namespace, self.dest, values)
          
-class isSqrtAction(argparse.Action):
-    def is_square(self, n):
-        '''
-        To account for large number overflows in standard library, this code was stolen from:
-            https://stackoverflow.com/a/44531128
-        '''
-        if n<1:
-            return False
-        else:
-            for i in range(int(n/2)+1):
-                if (i*i)==n:
-                    return True
-            return False
-    
-    def __call__(self, parser, namespace, values, option_string=None):
-         if not self.is_square(values):
-            parser.error("{0} is not a valid squared number. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
-            #raise argparse.ArgumentError("blah")
-
-         setattr(namespace, self.dest, values)
-
 if __name__ == "__main__":
     
     parser = ArgumentParser()
     parser.add_argument('-m','--mode',action=isModeAction, type=int)
     parser.add_argument('-trans', '-tr', '--transform', action=isTransformAction,type=int)
-    parser.add_argument('-t', '--tiles',action=isSqrtAction, type=int)
+    parser.add_argument('-t', '--tiles', type=int, nargs='+')
     parser.add_argument('-f', '--file', type = str)   
     args = vars(parser.parse_args())
 

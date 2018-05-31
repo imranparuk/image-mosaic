@@ -31,7 +31,10 @@ pip install scikit-image
 
 In the code, there are variables that can be changed
 1. The name of the input image -> 'mainImageTarget'
-2. Number of tiles to devide image into -> 'numberOfTiles'
+2. Number of tiles to devide image into -> 'numberOfTiles'. 
++ For square image you can input 1 number equal to the number of tiles (must be squared number)
++ For non squared images, you input the number of square on x axis, and number of squares on y axis
+
 3. Comparison Mode -> 
 + [1] Compare transformed rgb to transformed rgb (small tiles)
 + [2] Compare transformed rgb to transformed rgb (big tiles)
@@ -66,7 +69,11 @@ Refer to above (User Defined Variables) for explination on values,
 
 Example usage
 ```
-$	sudo python python_image_mosaic.py -m 1 -t 400 - tr 3 -f 1_in.jpg
+#For square image, 400 tiles (20x20)
+$	sudo python python_image_mosaic.py -m 1 -t 200 - tr 3 -f 1_in.jpg
+
+#For non-square image, 400 tiles (50x75)
+$	sudo python python_image_mosaic.py -m 1 -t 50, 75 - tr 3 -f 2_in.jpg
 ```
 
 ## Example Output
