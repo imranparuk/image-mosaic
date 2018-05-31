@@ -30,15 +30,15 @@ pip install scikit-image
 ### User Defined Variables
 
 In the code, there are variables that can be changed
-1. The name of the input image -> 'mainImageTarget'
-2. Number of tiles to devide image into -> 'numberOfTiles'. 
-+ For square image you can input 1 number equal to the number of tiles (must be squared number)
-+ For non squared images, you input the number of square on x axis, and number of squares on y axis
++ The name of the input image -> 'mainImageTarget'
++ Number of tiles to devide image into -> 'numberOfTiles'. 
+		+ For square image you can input 1 number equal to the number of tiles (must be squared number)
+		+ For non squared images, you input the number of square on x axis, and number of squares on y axis
 
-3. Comparison Mode -> 
++ Comparison Mode -> 
 		+ [1] Compare transformed rgb to transformed rgb (small tiles)
 		+ [2] Compare transformed rgb to transformed rgb (big tiles)
-4. Transform Mode ->  
++ Transform Mode ->  
 		+ [1] no transformation
 		+ [2] RGB -> sRGB
 		+ [3] RGB -> CIE-Lab (my implimentation) 
