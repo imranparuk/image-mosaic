@@ -75,6 +75,9 @@ Target Image               |  Resulting Image
 :-------------------------:|:-------------------------:
 ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/1_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_1_in.jpg)
 
+![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/2_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_2_in.jpg)
+
+
 
 ## Contributing
 
