@@ -66,8 +66,8 @@ class image_mosiac():
         rounds that number off to a whole number and creates an optiumum size 
         which is then used to resize the original image (maintaining original aspect ratio)
         """
-        xdiv = int(np_image.shape[1]/self.tile_max_px)
-        ydiv = int(np_image.shape[0]/self.tile_max_px)
+        xdiv = (np_image.shape[1]/self.tile_max_px)
+        ydiv = (np_image.shape[0]/self.tile_max_px)
 
         adjustScalex = int(self.tile_max_px * xdiv)
         adjustScaley = int(self.tile_max_px * ydiv)
