@@ -75,10 +75,6 @@ Target Image               |  Resulting Image
 :-------------------------:|:-------------------------:
 ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/1_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_1_in.jpg)
 
-![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/2_in.jpg)  |  ![](https://github.com/imranparuk/image-mosaic/blob/master/Example%20Output/out_2_in.jpg)
-
-
-
 ## Contributing
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
