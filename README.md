@@ -63,7 +63,7 @@ To use the script you need to attached arguments in the command-line,
 Refer to above (User Defined Variables) for explination on values, 
 
 + [-m] mode := comparison mode, is int of range [1 -> 4]
-+ [-t] tiles := number of tiles, is and int and must be a square number
++ [-t] tiles := number of tiles, explained in last section. 
 + [-tr] or [-trans] transform mode := transformation from RGB to ... , is int of range [1 -> 4]
 + [-f] file := target file, is the filename of the image.
 
@@ -72,7 +72,7 @@ Example usage
 #For square image, 400 tiles (20x20)
 $	sudo python python_image_mosaic.py -m 1 -t 200 - tr 3 -f 1_in.jpg
 
-#For non-square image, 400 tiles (50x75)
+#For non-square image, 3750 tiles (50x75)
 $	sudo python python_image_mosaic.py -m 1 -t 50, 75 - tr 3 -f 2_in.jpg
 ```
 
