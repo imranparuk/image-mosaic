@@ -191,10 +191,8 @@ class image_mosiac():
         it also creates small tiles that will fit in the max tile size that will later be used to create the
         final image
         Secondly, based on the mode different means are calculated
-        Mode 1: Mean is of the small tile images 
-        Mode 2: Mean is of the transformed small tile images
-        Mode 3: Mean is of large tile images
-        Mode 4: Mean is of the transformed large tile images
+        Mode 1: Mean is of the transformed small tile images 
+        Mode 2: Mean is of the transformed large tile images
         """
         for file in self.tilesFiles:
             tile_pic = Image.open(file)
@@ -204,14 +202,11 @@ class image_mosiac():
             tile_pic_mini = tile_pic.resize(size)
             tile_np_mini = numpy.array(tile_pic_mini)
             
-            if (self.comparisonMode == 1):         
-                title_np_ave = numpy.mean(tile_np_mini, axis=(0, 1))
-            elif (self.comparisonMode == 2):
+            if (self.comparisonMode == 1):    
                 title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np_mini.copy()), axis=(0, 1))
-            elif (self.comparisonMode == 3):
-                title_np_ave = numpy.mean(tile_np, axis=(0, 1))
             else:
                 title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np.copy()), axis=(0, 1))
+
             
             self.tileDict[file] = [tile_np_mini, title_np_ave]
     
@@ -302,7 +297,7 @@ if __name__ == "__main__":
 
     #& user defined if need be. 
     mode = args['mode']
-    transform = args['mode']
+    transform = args['transform']
     numberOfTiles = args['tiles']
     mainImageTarget = args['file']
     #&
