@@ -52,9 +52,7 @@ class image_mosiac():
 
         self.scaled_input_image = self.scaleInputImage(self.input_image, self.np_input_image)
         self.np_scaled_input_image = numpy.array(self.scaled_input_image)
-        
-        print(self.np_scaled_input_image.shape)
-        
+               
         self.tile_max_x_px = int(self.np_scaled_input_image.shape[1]/self.num_tiles_x)
         self.tile_max_y_px = int(self.np_scaled_input_image.shape[0]/self.num_tiles_y)
         
@@ -77,9 +75,10 @@ class image_mosiac():
         """
         xdiv = (np_image.shape[1]/self.num_tiles_x)
         ydiv = (np_image.shape[0]/self.num_tiles_y)
-
-        adjustScalex = int(self.num_tiles_x * xdiv)
-        adjustScaley = int(self.num_tiles_y * ydiv)
+        
+        #int (round down always) or round (actual rounding to nearest int)
+        adjustScalex = int(self.num_tiles_x) * int(xdiv)
+        adjustScaley = int(self.num_tiles_y) * int(ydiv)
         
         size = (adjustScalex, adjustScaley)
         return image.resize(size, Image.ANTIALIAS)
@@ -236,15 +235,12 @@ class image_mosiac():
         xdiv = self.tile_max_x_px
         ydiv = self.tile_max_y_px
         
-        print(self.np_scaled_input_image.shape[1])
-        print(numpy.arange(19,750,20))
-        
         for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[1]+1,xdiv):
             for j in numpy.arange(ydiv-1,self.np_scaled_input_image.shape[0],ydiv):
                 int_i = int(i)
                 int_j = int(j)
                 
-                sub_matrix =self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1].copy()
+                sub_matrix =self.np_scaled_input_image[int_j-(ydiv-1):int_j, int_i-(xdiv-1):int_i].copy()
                 sub_average = numpy.mean(self.transformMatrixConvert(sub_matrix) , axis=(0, 1)) 
        
                 maximum = self.MaxFunction(self.tileDict, sub_average)  
@@ -267,7 +263,6 @@ class isModeAction(argparse.Action):
          if values not in range(1, 5):
             parser.error("{0} is not a valid mode. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
             #raise argparse.ArgumentError("Minimum bandwidth is 12")
-
          setattr(namespace, self.dest, values)
          
 class isTransformAction(argparse.Action):
@@ -275,7 +270,6 @@ class isTransformAction(argparse.Action):
          if values not in range(1, 5):
             parser.error("{0} is not a valid transform. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
             #raise argparse.ArgumentError("Minimum bandwidth is 12")
-
          setattr(namespace, self.dest, values)
          
 if __name__ == "__main__":
@@ -308,7 +302,14 @@ if __name__ == "__main__":
 
     print("Target Image:= {0}".format(path+mainImageSubdir+mainImageTarget))
     print("Tile Images Directory:= {0}".format(path + tileImagesSubdir))
-    print("Number of Tiles:= {0}".format(numberOfTiles))
+    
+    if (len(numberOfTiles) > 1):  
+        numTiles = numberOfTiles[0] * numberOfTiles[1]
+        print("Number of Tiles:= {0}".format(numTiles))
+    else:
+        print("Number of Tiles:= {0}".format(*numberOfTiles))
+
+    print()
     
     sys.stdout.write("Program Running: ")
     spinner = spinner.Spinner()
@@ -320,6 +321,8 @@ if __name__ == "__main__":
     image_mos = image_mosiac(mainImagePath, files, numberOfTiles, mode, transform)
 
     image = image_mos.returnImage()
+    image.show()
+
     with open(path+mainImageSubdir+output_image, 'w') as f:
         image.save(f)
     
@@ -328,7 +331,6 @@ if __name__ == "__main__":
 
     print("Output file:= {0}".format(path+mainImageSubdir+output_image))
 
-    image.show()
     #eof
 
 
