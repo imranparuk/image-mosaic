@@ -52,7 +52,7 @@ In the code, there are variables that can be changed
 
 ```python
 #& user defined if need be. 
-mode = args['mode']			#1
+mode = args['mode']						#1
 transform = args['transform']			#3
 numberOfTiles = args['tiles']			#400
 mainImageTarget = args['file']			#"1_in.jpg"
@@ -65,7 +65,7 @@ To use the script you need to attached arguments in the command-line,
 
 Refer to above (User Defined Variables) for explination on values, 
 
-+ [-m] mode := comparison mode, is int of range [1 -> 4]
++ [-m] mode := comparison mode, is int of range [1 -> 2]
 + [-t] tiles := number of tiles, explained in last section. 
 + [-tr] or [-trans] transform mode := transformation from RGB to ... , is int of range [1 -> 4]
 + [-f] file := target file, is the filename of the image.
