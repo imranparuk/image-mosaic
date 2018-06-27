@@ -73,10 +73,10 @@ Refer to above (User Defined Variables) for explination on values,
 Example usage
 ```
 #For square image, 400 tiles (20x20)
-$	sudo python python_image_mosaic.py -m 1 -t 200 - tr 3 -f 1_in.jpg
+$	sudo python python_image_mosaic.py -m 1 -t 200 -tr 3 -f 1_in.jpg
 
 #For non-square image, 3750 tiles (50x75)
-$	sudo python python_image_mosaic.py -m 1 -t 50, 75 - tr 3 -f 2_in.jpg
+$	sudo python python_image_mosaic.py -m 1 -t 50, 75 -tr 3 -f 2_in.jpg
 ```
 
 ## Example Output
