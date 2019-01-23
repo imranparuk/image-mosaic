@@ -13,6 +13,8 @@ import os
 from os import listdir
 from os.path import isfile, join
 
+from pathlib import Path
+
 import sys
 from sys import argv
 
@@ -28,26 +30,26 @@ class image_mosiac():
     This class creates image mosaics in python using numpy and PIL (Pillow) 
     -An input image is used to create a new image from 'tiles' (other images)    
     """
-    def __init__(self, inputImageFile, tilesFiles, numTiles, comparisonMode=1, transform=1):
+    def __init__(self, input_image_file, tiles_files, num_tiles, comparison_mode=1, transform=1):
         """
         Python class constructor
             - initilizes all class objects
         """
         self.transform = transform
-        self.comparisonMode = comparisonMode
+        self.comparison_mode = comparison_mode
         
-        if not(len(numTiles) > 1):
-            tile_max_px = numpy.sqrt(numTiles)
+        if not(len(num_tiles) > 1):
+            tile_max_px = numpy.sqrt(num_tiles)
             self.num_tiles_x = tile_max_px
             self.num_tiles_y = tile_max_px
         else:
-            self.num_tiles_x = numTiles[0]
-            self.num_tiles_y = numTiles[1]
+            self.num_tiles_x = num_tiles[0]
+            self.num_tiles_y = num_tiles[1]
        
-        self.tilesFiles = tilesFiles
+        self.tiles_files = tiles_files
         self.N = float(4.0 / 29.0)
 
-        self.input_image = Image.open(inputImageFile)
+        self.input_image = Image.open(input_image_file)
         self.np_input_image = numpy.array(self.input_image)
 
         self.scaled_input_image = self.scaleInputImage(self.input_image, self.np_input_image)
@@ -62,11 +64,11 @@ class image_mosiac():
     
         self.illumination_matrix = numpy.array([95.047, 100.0, 108.883])
         
-        self.tileDict = {}
-        self.populateTileDict()
-        self.iterateThroughArray()
+        self.tile_dict = {}
+        self.populate_tile_dict()
+        self.iterate_through_array()
   
-    def scaleInputImage(self, image, np_image):
+    def scale_input_image(self, image, np_image):
         """
         This function scales in input image to ensure you can fit all the tiles in
         it takes the current size of 'image', tries to fit as many tiles in, then
@@ -94,7 +96,7 @@ class image_mosiac():
         return lab
 
 
-    def convert_rgb_to_srgb(self, rgbVal):
+    def convert_rgb_to_srgb(self, rgb_val):
         '''
         This function converts from the RGB color-space to the sRGB color space
         Transformation formulae from: 
@@ -103,12 +105,12 @@ class image_mosiac():
             V' = {   V/12.92                   if (v < 0.04545)
                  {   ((V+0.055)/1.055)^2.4     else
         '''
-        in_col_np = numpy.array(rgbVal)
+        in_col_np = numpy.array(rgb_val)
         in_col_np_norm = in_col_np/255
         return numpy.array([ numpy.power(((value + 0.055) / 1.055), 2.4) if value > 0.04045 else value / 12.92 for value in in_col_np_norm])
     
        
-    def convert_srgb_to_lab(self, srgbVal):
+    def convert_srgb_to_lab(self, srgb_val):
         '''
         This function converts sRGB to the CIE-XYZ, then to the CIE-*Lab color spaces respectively. 
         following the algorithm described in these links:
@@ -118,9 +120,9 @@ class image_mosiac():
             
         Assumed: Under Illuminant D65 with normalization Y = 100
         '''
-        srgbVal_norm = srgbVal.dot(100)
+        srgbval_norm = srgb_val.dot(100)
 
-        dot_prod = self.conversion_matrix.dot(srgbVal_norm)
+        dot_prod = self.conversion_matrix.dot(srgbval_norm)
         dot_prod_illumin = numpy.array([dot_prod[0]/self.illumination_matrix[0], dot_prod[1]/self.illumination_matrix[1], dot_prod[2]/self.illumination_matrix[2] ])
         
         XYZ = [ (numpy.power(value, 1/3) if (value > 0.008856) else (7.787 * value) + (16 / 116) ) for value in dot_prod_illumin]
@@ -131,14 +133,14 @@ class image_mosiac():
     
         return numpy.array([L,a,b])
     
-    def my_rgb_to_lab(self, inputColor):
+    def my_rgb_to_lab(self, input_color):
         '''
         this function converts from colors from the RGB color-space to the CIE-Lab color space
         '''
-        srgb = self.convert_rgb_to_srgb(inputColor)
+        srgb = self.convert_rgb_to_srgb(input_color)
         return  self.convert_srgb_to_lab(srgb)
     
-    def transformMatrixConvert(self, numpyArr):
+    def transform_matrix_convert(self, np_arr):
         """
         Transforms RGB numpy matrix to LAB numpy matrix
         
@@ -148,52 +150,54 @@ class image_mosiac():
         [3] RGB -> LAB (using my own implimentation)
         [4] RGB -> LAB (using built in library)
         """
-        size = numpyArr.shape
+        # todo: fix this, its ugly
+        size = np_arr.shape
         x = size[0]
         y = size[1]
         for i in range(0, x-1):
             for j in range(0, y-1):
-                tempArr = numpyArr[i, j]        
-                if (self.transform == 1):
-                    tempArrTransform = tempArr
-                elif (self.transform == 2):
-                    tempArrTransform = self.convert_rgb_to_srgb(tempArr)
-                elif (self.transform == 3):
-                    tempArrTransform = self.my_rgb_to_lab(tempArr)
+                temp_arr = np_arr[i, j]
+                if self.transform == 1:
+                    temp_arr_transform = temp_arr
+                elif self.transform == 2:
+                    temp_arr_transform = self.convert_rgb_to_srgb(tempArr)
+                elif self.transform == 3:
+                    temp_arr_transform = self.my_rgb_to_lab(tempArr)
                 else:
-                    tempArrTransform = self.scipy_rgb_to_lab(tempArr)
-                numpyArr[i, j] = tempArrTransform
-        return numpyArr            
-    
-    def getEuclideanDistance(self, x, y):
+                    temp_arr_transform = self.scipy_rgb_to_lab(tempArr)
+                np_arr[i, j] = temp_arr_transform
+        return np_arr
+
+    @staticmethod
+    def get_eucledian_dist(x, y):
         """
         Calculates the Euclidean Distance based off the following equasion
         #E_d(x,y) = sqrt( square(Ax-Ay) + square(Bx-By) + square(Cx-Cy) ).
         """
         return numpy.linalg.norm(x-y)
     
-    def MaxFunction(self, input_dict, cmp):
+    def max_function(self, input_dict, cmp):
         """
         This custom max function returns a dictionary of item in 'input_dict'
         which has the lowest Euclidean distance to 'cmp'. It returns a dictionary
         with one item, which is the dictionary item which the lowest distance
         """
-        maxItem = {}
+        max_item = {}
             
         for key, value in input_dict.items():   
-            exld = self.getEuclideanDistance(value[1], cmp)
+            exld = self.get_eucledian_dist(value[1], cmp)
             try:
-                list(maxItem.values())[0]
+                list(max_item.values())[0]
             except IndexError:
-                maxItem.update({key:exld})
+                max_item.update({key:exld})
             else:
-                new_exld = self.getEuclideanDistance(value[1], cmp) 
-                if (new_exld < list(maxItem.values())[0] ):
-                    maxItem.clear()
-                    maxItem.update({key:exld})
-        return maxItem
+                new_exld = self.get_eucledian_dist(value[1], cmp)
+                if new_exld < list(max_item.values())[0]:
+                    max_item.clear()
+                    max_item.update({key:exld})
+        return max_item
     
-    def populateTileDict(self):
+    def populate_tile_dict(self):
         """
         Firstly, this function converts the list of image files into image objects as well as numpy objects
         it also creates small tiles that will fit in the max tile size that will later be used to create the
@@ -202,7 +206,7 @@ class image_mosiac():
         Mode 1: Mean is of the transformed small tile images 
         Mode 2: Mean is of the transformed large tile images
         """
-        for file in self.tilesFiles:
+        for file in self.tiles_files:
             tile_pic = Image.open(file)
             tile_np = numpy.array(tile_pic)
             
@@ -211,15 +215,14 @@ class image_mosiac():
             
             tile_np_mini = numpy.array(tile_pic_mini)
             
-            if (self.comparisonMode == 1):    
-                title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np_mini.copy()), axis=(0, 1))
+            if self.comparison_mode == 1:
+                title_np_ave = numpy.mean(self.transform_matrix_convert(tile_np_mini.copy()), axis=(0, 1))
             else:
-                title_np_ave = numpy.mean(self.transformMatrixConvert(tile_np.copy()), axis=(0, 1))
+                title_np_ave = numpy.mean(self.transform_matrix_convert(tile_np.copy()), axis=(0, 1))
 
-            
-            self.tileDict[file] = [tile_np_mini, title_np_ave]
+            self.tile_dict[file] = [tile_np_mini, title_np_ave]
     
-    def iterateThroughArray(self):
+    def iterate_through_array(self):
         """
         This function is used to iterate through the main image matrix pixels. 
         A sub-matrix is extracted and the mean of its image domain is calculated
@@ -227,7 +230,7 @@ class image_mosiac():
         if matrix A is below:
         
         |0  1  2  3 |     -> each element is extracted and a tile matched to it via
-        |4  5  6  7 |        the custom MaxFunction using the max Euclidean distace
+        |4  5  6  7 |        the custom max_function using the max Euclidean distace
         |8  9  10 11|        after which, this elemet is replaced by the matrix of 
         |12 13 14 15|        the matched tile
         
@@ -235,101 +238,99 @@ class image_mosiac():
         xdiv = self.tile_max_x_px
         ydiv = self.tile_max_y_px
         
-        for i in numpy.arange(xdiv-1,self.np_scaled_input_image.shape[1]+1,xdiv):
-            for j in numpy.arange(ydiv-1,self.np_scaled_input_image.shape[0],ydiv):
+        for i in numpy.arange(xdiv-1, self.np_scaled_input_image.shape[1]+1,xdiv):
+            for j in numpy.arange(ydiv-1, self.np_scaled_input_image.shape[0],ydiv):
                 int_i = int(i)
                 int_j = int(j)
                 
-                sub_matrix =self.np_scaled_input_image[int_j-(ydiv-1):int_j, int_i-(xdiv-1):int_i].copy()
-                sub_average = numpy.mean(self.transformMatrixConvert(sub_matrix) , axis=(0, 1)) 
+                sub_matrix = self.np_scaled_input_image[int_j-(ydiv-1):int_j, int_i-(xdiv-1):int_i].copy()
+                sub_average = numpy.mean(self.transform_matrix_convert(sub_matrix), axis=(0, 1))
        
-                maximum = self.MaxFunction(self.tileDict, sub_average)  
+                maximum = self.max_function(self.tile_dict, sub_average)
                 maxKey = list(maximum.keys())[0]
                         
-                #self.np_scaled_input_image[int_i-(xdiv-1):int_i+1, int_j-(ydiv-1):int_j+1] = self.tileDict[(maxKey)][0]
-                self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1] = self.tileDict[(maxKey)][0]
-    def returnImage(self):
+                self.np_scaled_input_image[int_j-(ydiv-1):int_j+1, int_i-(xdiv-1):int_i+1] = self.tile_dict[maxKey][0]
+    
+    def return_image(self):
         """
         This function is used to return a resulting image after all the image processing is done.
         It returns a standard RGB image that can be saved.
         """
         return Image.fromarray(self.np_scaled_input_image, 'RGB')   
     
-    
-####################################################################################################################################################
-       
-class isModeAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-         if values not in range(1, 5):
-            parser.error("{0} is not a valid mode. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
-            #raise argparse.ArgumentError("Minimum bandwidth is 12")
-         setattr(namespace, self.dest, values)
-         
-class isTransformAction(argparse.Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-         if values not in range(1, 5):
-            parser.error("{0} is not a valid transform. Refer to github doc -> https://github.com/imranparuk/image-mosaic".format(option_string))
-            #raise argparse.ArgumentError("Minimum bandwidth is 12")
-         setattr(namespace, self.dest, values)
+
+class ModeAction(argparse.Action):
+    def __call__(self, parser_, namespace, values, option_string=None):
+        if values not in range(1, 5):
+            parser_.error("{0} is not a valid mode. Refer to github doc -> https://github.com/imranparuk/image-mosaic"
+                          .format(option_string))
+        setattr(namespace, self.dest, values)
+
+
+class TransformAction(argparse.Action):
+    def __call__(self, parser_, namespace, values, option_string=None):
+        if values not in range(1, 5):
+            parser_.error("{0} is not a valid transform. Refer to github doc -> https://github.com/imranparuk/image-"
+                          "mosaic".format(option_string))
+        setattr(namespace, self.dest, values)
          
 if __name__ == "__main__":
-    
+
     parser = ArgumentParser()
-    parser.add_argument('-m','--mode',action=isModeAction, type=int)
-    parser.add_argument('-trans', '-tr', '--transform', action=isTransformAction,type=int)
+    parser.add_argument('-m','--mode',action=ModeAction, type=int)
+    parser.add_argument('-trans', '-tr', '--transform', action=TransformAction,type=int)
     parser.add_argument('-t', '--tiles', type=int, nargs='+')
-    parser.add_argument('-f', '--file', type = str)   
+    parser.add_argument('-fi', '--file_in', type = str, default='1_in.jpg')
+    parser.add_argument('-fo', '--file_out', type = str, default='1_out.jpg')
+
+    parser.add_argument('-d', '--dir', type = str, default='../images/')
+
     args = vars(parser.parse_args())
 
-    #& user defined if need be. 
     mode = args['mode']
     transform = args['transform']
-    numberOfTiles = args['tiles']
-    mainImageTarget = args['file']
-    #&
-        
-    try:
-        wk_dir =  os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    except NameError:
-        pass
-    else:
-        wk_dir =  os.path.dirname(os.path.dirname(os.path.realpath('__file__')))
-        
-    mainImageSubdir = "\\Example Output\\"
-    tileImagesSubdir = "\\DB\\"
-    path = os.path.normpath(wk_dir)
-    output_image = "out_" + mainImageTarget
+    num_tiles = args['tiles']
+    target_image = args['file']
+    target_dir = args['dir']
 
-    print("Target Image:= {0}".format(path+mainImageSubdir+mainImageTarget))
-    print("Tile Images Directory:= {0}".format(path + tileImagesSubdir))
-    
-    if (len(numberOfTiles) > 1):  
-        numTiles = numberOfTiles[0] * numberOfTiles[1]
-        print("Number of Tiles:= {0}".format(numTiles))
+    # todo: fix this, still ugly
+    path = Path(target_dir)
+    tiles_dir = path / Path('reference_files/DB')
+    output_dir = path / Path("out")
+    in_file = path / Path("../images") / Path(target_image)
+    out_file = output_dir / Path("out_1.jpg")
+
+    print("Input Image File:= {0}".format(in_file))
+    print("Output file:= {0}".format(out_file))
+    print("Tile Images Directory:= {0}".format(tiles_dir))
+    print("Output Directory:= {0}".format(output_dir))
+
+    if (len(num_tiles) > 1):
+        num_tiles_tot = num_tiles[0] * num_tiles[1]
+        print("Number of Tiles:= {0}".format(num_tiles_tot))
     else:
-        print("Number of Tiles:= {0}".format(*numberOfTiles))
+        print("Number of Tiles:= {0}".format(*num_tiles))
 
     print()
     
     sys.stdout.write("Program Running: ")
     spinner = spinner.Spinner()
     spinner.start()
-    
-    files = [path + tileImagesSubdir + f for f in listdir(path + tileImagesSubdir) if isfile(join(path + tileImagesSubdir, f))]
-    mainImagePath = path+mainImageSubdir+mainImageTarget
 
-    image_mos = image_mosiac(mainImagePath, files, numberOfTiles, mode, transform)
+    temp_tile_path = Path(os.path.abspath(str(tiles_dir)))
 
-    image = image_mos.returnImage()
+    files = [str(temp_tile_path / f) for f in listdir(str(temp_tile_path)) if isfile(str(temp_tile_path / Path(f)))]
+
+    image_mos = image_mosiac(target_image_file, files, num_tiles, mode, transform)
+
+    image = image_mos.return_image()
     image.show()
 
-    with open(path+mainImageSubdir+output_image, 'w') as f:
+    with open(str(out_file), 'w') as f:
         image.save(f)
     
     spinner.stop()
     print("Done.")
-
-    print("Output file:= {0}".format(path+mainImageSubdir+output_image))
 
     #eof
 
